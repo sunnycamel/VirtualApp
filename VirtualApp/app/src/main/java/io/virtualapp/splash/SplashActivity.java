@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.natives.NativeMethods;
 
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
 import io.virtualapp.abs.ui.VActivity;
 import io.virtualapp.abs.ui.VUiKit;
-import io.virtualapp.home.FlurryROMCollector;
 import io.virtualapp.home.HomeActivity;
 import jonathanfinerty.once.Once;
 
@@ -24,10 +24,7 @@ public class SplashActivity extends VActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         VUiKit.defer().when(() -> {
-            if (!Once.beenDone("collect_flurry")) {
-                FlurryROMCollector.startCollect();
-                Once.markDone("collect_flurry");
-            }
+            NativeMethods.init();
             long time = System.currentTimeMillis();
             VirtualCore.get().waitForEngine();
             time = System.currentTimeMillis() - time;

@@ -1,7 +1,10 @@
 package com.lody.virtual.client.hook.proxies.phonesubinfo;
 
+import android.util.Log;
+
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.ReplaceCallingPkgMethodProxy;
+import com.lody.virtual.client.hook.base.ReplaceLastPkgMethodProxy;
 
 import java.lang.reflect.Method;
 
@@ -34,6 +37,24 @@ class MethodProxies {
         // just for letv eui
         public GetDeviceIdForSubscriber() {
             super("getDeviceIdForSubscriber");
+        }
+
+        @Override
+        public Object afterCall(Object who, Method method, Object[] args, Object result) throws Throwable {
+            if (VirtualCore.get().getPhoneInfoDelegate() != null) {
+                String res = VirtualCore.get().getPhoneInfoDelegate().getDeviceId((String) result, getAppUserId());
+                if (res != null) {
+                    return res;
+                }
+            }
+            return super.afterCall(who, method, args, result);
+        }
+    }
+
+    static class GetImeiForSubscriber extends ReplaceCallingPkgMethodProxy {
+
+        public GetImeiForSubscriber() {
+            super("getImeiForSubscriber");
         }
 
         @Override
