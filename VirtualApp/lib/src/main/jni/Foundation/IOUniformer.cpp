@@ -4,6 +4,7 @@
 #include <util.h>
 #include "IOUniformer.h"
 #include "native_hook.h"
+#include <android/log.h>
 
 static list<std::string> ReadOnlyPathMap;
 static std::map<std::string/*orig_path*/, std::string/*new_path*/> IORedirectMap;
@@ -481,11 +482,20 @@ HOOK_DEF(int, __openat, int fd, const char *pathname, int flags, int mode) {
     FREE(redirect_path, pathname);
     return ret;
 }
+
 // int __open(const char *pathname, int flags, int mode);
 HOOK_DEF(int, __open, const char *pathname, int flags, int mode) {
     const char *redirect_path = match_redirected_path(pathname);
     int ret = syscall(__NR_open, redirect_path, flags, mode);
     FREE(redirect_path, pathname);
+    LOGE("################path: %s, fd: %d", pathname, ret);
+    return ret;
+}
+
+// int read(int fd, unsigned char *buf, int size);
+HOOK_DEF(int, read, int fd, unsigned char *buf, int size) {
+    LOGE("################fd: %d", fd);
+    int ret = syscall(__NR_read, fd, buf, size);
     return ret;
 }
 
